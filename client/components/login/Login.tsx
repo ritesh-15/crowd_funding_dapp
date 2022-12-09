@@ -1,9 +1,19 @@
 import Image from "next/image";
+import { useEffect } from "react";
+import useModal from "../../app/slices/modalSlice/useModal";
+import userUser from "../../app/slices/userSlice/userUser";
 import useWallet from "../../hooks/useWallet";
 import Button from "../button/Button";
 
 export default function Login() {
   const { connectWallet } = useWallet();
+  const { handleModalState } = useModal();
+  const { walletAddress } = userUser();
+
+  useEffect(() => {
+    if (!walletAddress) return;
+    handleModalState(false);
+  }, [walletAddress]);
 
   return (
     <div className="">

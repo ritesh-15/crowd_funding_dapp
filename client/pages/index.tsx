@@ -1,12 +1,12 @@
 import Image from "next/image";
-import { Button, Navbar } from "../components";
+import { Button } from "../components";
 import { AiOutlineFund, AiOutlineDisconnect } from "react-icons/ai";
 import { TfiHelpAlt } from "react-icons/tfi";
 import useWallet from "../hooks/useWallet";
+import Link from "next/link";
 
 const style = {
-  main: "bg-white dark:bg-darkBg min-h-screen",
-  section: "max-w-[1300px] mx-auto h-full w-[95%] pb-4",
+  section: "h-full pb-4 min-h-screen flex flex-col justify-center",
   hero: "flex items-center mt-12 justify-between flex-col md:flex-row flex-col-reverse",
 };
 
@@ -14,10 +14,8 @@ export default function Home() {
   useWallet();
 
   return (
-    <main className={style.main}>
+    <>
       <section className={style.section}>
-        <Navbar />
-
         <div className={style.hero}>
           <div className="flex-1 mt-8 md:mt-0 flex flex-col items-center md:items-start">
             <h1 className="text-3xl w-full md:text-5xl md:max-w-[70%] font-bold font-nato text-center md:text-left mx-auto md:mx-0">
@@ -28,10 +26,12 @@ export default function Home() {
               platform will let you do that effortlessely with security of
               blockchain.
             </p>
-            <Button
-              title="Explore"
-              className="w-full px-4 py-3 mt-8 max-w-[300px]"
-            />
+            <Link href="/campaigns" className="mt-8 w-full">
+              <Button
+                title="Explore"
+                className="w-full px-4 py-3 max-w-[300px]"
+              />
+            </Link>
           </div>
 
           <div className="flex-1">
@@ -74,6 +74,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-    </main>
+    </>
   );
 }

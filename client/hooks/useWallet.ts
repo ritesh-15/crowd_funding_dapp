@@ -19,7 +19,6 @@ export default function useWallet() {
       if (eth == null) return;
       const provider = new ethers.providers.Web3Provider(eth);
       const [address] = await provider.send("eth_accounts", []);
-      findInDbOrCreate(address);
       handleWalletAddress(address);
     })();
   }, []);
@@ -28,29 +27,7 @@ export default function useWallet() {
     if (eth == null) return;
     const provider = new ethers.providers.Web3Provider(eth);
     const [address] = await provider.send("eth_requestAccounts", []);
-
-    findInDbOrCreate(address);
-
     handleWalletAddress(address);
-  };
-
-  const findInDbOrCreate = async (address: string) => {
-    try {
-      const result = await superbase
-        .from("users")
-        .select()
-        .eq("wallet", address)
-        .single();
-
-      console.log(result);
-
-      if (result.data == null) {
-        const user = await superbase.from("users").insert({ wallet: address });
-        console.log(user);
-      }
-    } catch (e) {
-      // @ts-ignore
-    }
   };
 
   return { connectWallet };

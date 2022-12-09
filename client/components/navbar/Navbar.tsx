@@ -12,7 +12,7 @@ import Modal from "../modal/Modal";
 const style = {
   listStyle: "mx-4 font-nato cursor-pointer",
   h1: "font-bold font-nato text-xl",
-  nav: "w-full dark:bg-darkBg bg-lightBg flex items-center justify-between py-2",
+  nav: "dark:bg-darkBg bg-white shadow-md flex items-center justify-between py-3 fixed top-0 left-0 right-0",
   linkStyle: "hover:text-primary transition",
   iconStyle: "text-xl",
 };
@@ -25,60 +25,61 @@ export default function Navbar() {
   return (
     <>
       <nav className={style.nav}>
-        <h1 className={style.h1}>cfunder</h1>
-        <ul className="flex items-center">
-          <ul className="items-center hidden md:flex">
+        <div className="w-[95%] mx-auto max-w-[1300px] dark:bg-darkBg bg-white flex items-center justify-between">
+          <h1 className={style.h1}>
+            <Link href="/">cfunder</Link>
+          </h1>
+          <ul className="flex items-center">
+            <ul className="items-center hidden md:flex">
+              <li className={style.listStyle}>
+                <Link className={style.linkStyle} href="/">
+                  Home
+                </Link>
+              </li>
+              <li className={style.listStyle}>
+                <Link className={style.linkStyle} href="/">
+                  Explore
+                </Link>
+              </li>
+              <li className={style.listStyle}>
+                <Link className={style.linkStyle} href="/">
+                  Start Campaign
+                </Link>
+              </li>
+            </ul>
             <li className={style.listStyle}>
-              <Link className={style.linkStyle} href="/">
-                Home
-              </Link>
+              {isLoggedIn && walletAddress ? (
+                <div className="">
+                  <Image
+                    src={`https://avatars.dicebear.com/api/bottts/${walletAddress}.svg`}
+                    alt=""
+                    width={35}
+                    height={35}
+                  />
+                </div>
+              ) : (
+                <Button
+                  onClick={() => handleModalState(true)}
+                  title="Get Started"
+                  className="w-full px-2 py-2"
+                />
+              )}
             </li>
             <li className={style.listStyle}>
-              <Link className={style.linkStyle} href="/">
-                Explore
-              </Link>
-            </li>
-            <li className={style.listStyle}>
-              <Link className={style.linkStyle} href="/">
-                Start Campaign
-              </Link>
+              {theme == "dark" ? (
+                <BsSun
+                  className={style.iconStyle}
+                  onClick={() => setTheme("light")}
+                />
+              ) : (
+                <BsMoon
+                  className={style.iconStyle}
+                  onClick={() => setTheme("dark")}
+                />
+              )}
             </li>
           </ul>
-          <li className={style.listStyle}>
-            {isLoggedIn && walletAddress ? (
-              <div className="flex items-center bg-primary py-1 px-3 rounded-full">
-                <Image
-                  src={`https://avatars.dicebear.com/api/bottts/${walletAddress}.svg`}
-                  alt=""
-                  width={35}
-                  height={35}
-                />
-                <p className="font-nato text-sm ml-2">
-                  {parseWalletAddress(walletAddress)}
-                </p>
-              </div>
-            ) : (
-              <Button
-                onClick={() => handleModalState(true)}
-                title="Get Started"
-                className="w-full px-2 py-2"
-              />
-            )}
-          </li>
-          <li className={style.listStyle}>
-            {theme == "dark" ? (
-              <BsSun
-                className={style.iconStyle}
-                onClick={() => setTheme("light")}
-              />
-            ) : (
-              <BsMoon
-                className={style.iconStyle}
-                onClick={() => setTheme("dark")}
-              />
-            )}
-          </li>
-        </ul>
+        </div>
       </nav>
 
       {/* Moal */}
