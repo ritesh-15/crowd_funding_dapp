@@ -5,7 +5,10 @@ class Superbase {
 
   static get() {
     if (Superbase.client == null) {
-      Superbase.client = createClient("", "");
+      Superbase.client = createClient(
+        process.env.NEXT_PUBLIC_SUPERBASE_URL!!,
+        process.env.NEXT_PUBLIC_SUPERBASE_KEY!!
+      );
     }
 
     return Superbase.client;

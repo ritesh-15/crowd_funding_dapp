@@ -4,6 +4,8 @@ import { ThemeProvider } from "next-themes";
 import { Provider } from "react-redux";
 import { store } from "../app/store";
 import { Layout } from "../components";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
@@ -12,6 +14,10 @@ export default function App({ Component, pageProps }: AppProps) {
         <Layout>
           <Component {...pageProps} />
         </Layout>
+        <ToastContainer
+          position="bottom-right"
+          toastClassName="dark:bg-gray-700 dark:text-white bg-white"
+        />
       </Provider>
     </ThemeProvider>
   );

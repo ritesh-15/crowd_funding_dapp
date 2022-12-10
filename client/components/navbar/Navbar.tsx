@@ -4,7 +4,6 @@ import Link from "next/link";
 import { BsMoon, BsSun } from "react-icons/bs";
 import useModal from "../../app/slices/modalSlice/useModal";
 import userUser from "../../app/slices/userSlice/userUser";
-import { parseWalletAddress } from "../../utils/parseWalletAddress";
 import Button from "../button/Button";
 import Login from "../login/Login";
 import Modal from "../modal/Modal";
@@ -12,7 +11,7 @@ import Modal from "../modal/Modal";
 const style = {
   listStyle: "mx-4 font-nato cursor-pointer",
   h1: "font-bold font-nato text-xl",
-  nav: "dark:bg-darkBg bg-white shadow-md flex items-center justify-between py-3 fixed top-0 left-0 right-0",
+  nav: "dark:bg-darkBg bg-white z-10 shadow-md flex items-center justify-between py-3 fixed top-0 left-0 right-0",
   linkStyle: "hover:text-primary transition",
   iconStyle: "text-xl",
 };

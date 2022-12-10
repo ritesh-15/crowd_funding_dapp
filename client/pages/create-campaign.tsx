@@ -5,13 +5,16 @@ import { useFormik } from "formik";
 import { createCampaignSchema } from "../validation/createCampaignVal";
 import { ChangeEvent, useEffect, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
+import userUser from "../app/slices/userSlice/userUser";
+import { useRouter } from "next/router";
+import UploadIpfs from "../services/UploadIpfs.service";
+import { toast } from "react-toastify";
 
 interface ICreateCampaignState {
   title: string;
   story: string;
   name: string;
   amount: string;
-  endDate: Date;
   websiteURL?: string;
 }
 
@@ -21,23 +24,56 @@ function useCreateCampaign() {
     story: "",
     name: "",
     amount: "",
-    endDate: new Date(),
+    websiteURL: "",
   };
+
+  const [image, setImage] = useState<File | null>(null);
+
+  const [endDate, setEndDate] = useState<string>("");
 
   const { handleChange, values, errors, handleSubmit } =
     useFormik<ICreateCampaignState>({
       initialValues: initState,
-      onSubmit: (values) => {},
+      onSubmit: (values) => createCamapaign(values),
       validationSchema: createCampaignSchema,
     });
 
-  const [image, setImage] = useState<File | null>(null);
+  const createCamapaign = async (values: ICreateCampaignState) => {
+    // validate image
+    if (!image) {
+      toast.error("Please choose image!");
+      return;
+    }
+
+    // validate the end date
+    const endingDate = new Date(endDate);
+    if (endingDate.getTime() <= Date.now()) {
+      toast.error("The ending date should be in future!");
+      return;
+    }
+
+    // upload file to ipfs
+
+    const uploadService = new UploadIpfs();
+    const imagePath = await uploadService.uploadFile(image);
+
+    const dataPath = await uploadService.uploadJson({
+      ...values,
+      imageURL: imagePath,
+    });
+
+    console.log(dataPath);
+  };
 
   const handleImage = (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
     const file = files[0];
     setImage(file);
+  };
+
+  const handleSetEndDate = (event: ChangeEvent<HTMLInputElement>): void => {
+    setEndDate(event.target.value);
   };
 
   const clearImage = () => setImage(null);
@@ -50,6 +86,8 @@ function useCreateCampaign() {
     image,
     handleImage,
     clearImage,
+    handleSetEndDate,
+    endDate,
   };
 }
 
@@ -62,11 +100,17 @@ export default function CreateCampaign() {
     image,
     handleImage,
     clearImage,
+    endDate,
+    handleSetEndDate,
   } = useCreateCampaign();
+  const { isLoggedIn } = userUser();
+  const router = useRouter();
 
   useEffect(() => {
-    console.log(errors);
-  }, [errors]);
+    if (!isLoggedIn) {
+      router.push("/campaigns");
+    }
+  }, [isLoggedIn]);
 
   return (
     <section className="pt-[5rem] pb-8">
@@ -162,11 +206,10 @@ export default function CreateCampaign() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <Input
             title="End date"
-            value={values.endDate}
+            value={endDate}
             type="date"
-            onChange={handleChange}
+            onChange={handleSetEndDate}
             name="endDaate"
-            // error={errors.endDate}
           />
 
           <Input

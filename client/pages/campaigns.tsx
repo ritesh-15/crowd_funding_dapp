@@ -11,7 +11,9 @@ export default function Campaigns() {
         </Link>
       </div>
       <div className="mt-8 flex flex-wrap flex-row gap-12">
-        <Campaign />
+        <Link href="/7">
+          <Campaign />
+        </Link>
         <Campaign />
         <Campaign />
         <Campaign />
