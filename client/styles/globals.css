@@ -3,3 +3,23 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.spinner {
+  height: 50px;
+  width: 50px;
+  border-top: 3px solid #14cc60;
+  border-left: 3px solid #14cc60;
+  border-right: 3px solid #14cc60;
+  border-bottom: 3px solid transparent;
+  border-radius: 50%;
+  animation: 0.75s ease-in infinite spin;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

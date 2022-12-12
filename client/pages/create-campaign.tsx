@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { AiOutlineCloudUpload } from "react-icons/ai";
-import { Button, Input } from "../components";
+import { Button, Input, Loader } from "../components";
 import { useFormik } from "formik";
 import { createCampaignSchema } from "../validation/createCampaignVal";
 import { ChangeEvent, useEffect, useState } from "react";
@@ -9,6 +9,14 @@ import userUser from "../app/slices/userSlice/userUser";
 import { useRouter } from "next/router";
 import UploadIpfs from "../services/UploadIpfs.service";
 import { toast } from "react-toastify";
+import { getCrowdFundingContractSigned } from "../utils/getCrowdFundingContract";
+
+let eth: any = null;
+
+if (typeof window !== "undefined") {
+  const mywindow: any = window;
+  eth = mywindow.ethereum;
+}
 
 interface ICreateCampaignState {
   title: string;
@@ -18,7 +26,7 @@ interface ICreateCampaignState {
   websiteURL?: string;
 }
 
-function useCreateCampaign() {
+const useCreateCampaign = () => {
   const initState: ICreateCampaignState = {
     title: "",
     story: "",
@@ -28,8 +36,28 @@ function useCreateCampaign() {
   };
 
   const [image, setImage] = useState<File | null>(null);
-
   const [endDate, setEndDate] = useState<string>("");
+  const [loading, setLoading] = useState<string | undefined>();
+
+  useEffect(() => {
+    if (!eth) return;
+    const contract = getCrowdFundingContractSigned(eth);
+    contract.on(
+      "campaignCreated",
+      (
+        target: string,
+        startAt: number,
+        endAt: number,
+        dataURI: string,
+        address: string
+      ) => {
+        console.log({ target, startAt, endAt, dataURI, address });
+      }
+    );
+    return () => {
+      contract.off("campaignCreated", () => {});
+    };
+  }, [eth]);
 
   const { handleChange, values, errors, handleSubmit } =
     useFormik<ICreateCampaignState>({
@@ -52,8 +80,9 @@ function useCreateCampaign() {
       return;
     }
 
-    // upload file to ipfs
+    setLoading("Uploading the meta data to IPFS please wait...");
 
+    // upload file to ipfs
     const uploadService = new UploadIpfs();
     const imagePath = await uploadService.uploadFile(image);
 
@@ -62,7 +91,21 @@ function useCreateCampaign() {
       imageURL: imagePath,
     });
 
-    console.log(dataPath);
+    setLoading("Waiting for confiming transaction from wallet...");
+
+    if (!eth)
+      return toast.warning(
+        "No wallet found please try again by reloading the window!"
+      );
+
+    const contract = getCrowdFundingContractSigned(eth);
+    await contract.createCampaign(
+      Number(values.amount),
+      Date.now(),
+      new Date(endDate).getTime(),
+      dataPath
+    );
+    setLoading(undefined);
   };
 
   const handleImage = (e: ChangeEvent<HTMLInputElement>) => {
@@ -88,8 +131,9 @@ function useCreateCampaign() {
     clearImage,
     handleSetEndDate,
     endDate,
+    loading,
   };
-}
+};
 
 export default function CreateCampaign() {
   const {
@@ -102,6 +146,7 @@ export default function CreateCampaign() {
     clearImage,
     endDate,
     handleSetEndDate,
+    loading,
   } = useCreateCampaign();
   const { isLoggedIn } = userUser();
   const router = useRouter();
@@ -113,123 +158,129 @@ export default function CreateCampaign() {
   }, [isLoggedIn]);
 
   return (
-    <section className="pt-[5rem] pb-8">
-      <h1 className="text-2xl font-nato font-bold">Start Your Campaign 🚀🚀</h1>
-      <form onSubmit={handleSubmit} action="" className="mt-8">
-        <Input
-          title="Campagin title"
-          value={values.title}
-          type="text"
-          onChange={handleChange}
-          name="title"
-          error={errors.title}
-        />
+    <>
+      <section className="pt-[5rem] pb-8">
+        <h1 className="text-2xl font-nato font-bold">
+          Start Your Campaign 🚀🚀
+        </h1>
+        <form onSubmit={handleSubmit} action="" className="mt-8">
+          <Input
+            title="Campagin title"
+            value={values.title}
+            type="text"
+            onChange={handleChange}
+            name="title"
+            error={errors.title}
+          />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-4">
-          <div className="">
-            <label htmlFor="" className="font-nato">
-              Story
-            </label>
-            <small className="block mt-1 font-nato font-light">
-              Note that story should be engaging so that funders can invest in
-              your campagin
-            </small>
-            <textarea
-              value={values.story}
-              onChange={handleChange}
-              name="story"
-              className="bg-gray-100 dark:bg-gray-700 min-h-[250px] resize-none rounded-md font-nato px-2 mt-2 py-3 w-full outline-none"
-            />
-            {errors.story && (
-              <small className="mt-1 text-[0.75rem] font-nato font-light text-red-400">
-                {errors.story}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-4">
+            <div className="">
+              <label htmlFor="" className="font-nato">
+                Story
+              </label>
+              <small className="block mt-1 font-nato font-light">
+                Note that story should be engaging so that funders can invest in
+                your campagin
               </small>
+              <textarea
+                value={values.story}
+                onChange={handleChange}
+                name="story"
+                className="bg-gray-100 dark:bg-gray-700 min-h-[250px] resize-none rounded-md font-nato px-2 mt-2 py-3 w-full outline-none"
+              />
+              {errors.story && (
+                <small className="mt-1 text-[0.75rem] font-nato font-light text-red-400">
+                  {errors.story}
+                </small>
+              )}
+            </div>
+
+            {image ? (
+              <div className="relative h-[300px] md:h-full w-full rounded-lg overflow-hidden">
+                <Image
+                  src={URL.createObjectURL(image)}
+                  alt=""
+                  fill
+                  className="object-cover"
+                />
+                <div
+                  onClick={() => clearImage()}
+                  className="absolute cursor-pointer bg-gray-500 rounded-full p-1 top-1 right-1"
+                >
+                  <AiOutlineClose className="text-xl text-white" />
+                </div>
+              </div>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center flex-col">
+                <label htmlFor="file">
+                  <div className="hover:text-primary flex items-center justify-center flex-col cursor-pointer transition">
+                    <AiOutlineCloudUpload className="text-5xl" />
+                    <span className="mt-2 font-nato">
+                      Upload image for campaign
+                    </span>
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/jpg"
+                    onChange={handleImage}
+                    className="hidden"
+                    id="file"
+                  />
+                </label>
+              </div>
             )}
           </div>
 
-          {image ? (
-            <div className="relative h-[300px] md:h-full w-full rounded-lg overflow-hidden">
-              <Image
-                src={URL.createObjectURL(image)}
-                alt=""
-                fill
-                className="object-cover"
-              />
-              <div
-                onClick={() => clearImage()}
-                className="absolute cursor-pointer bg-gray-500 rounded-full p-1 top-1 right-1"
-              >
-                <AiOutlineClose className="text-xl text-white" />
-              </div>
-            </div>
-          ) : (
-            <div className="w-full h-full flex items-center justify-center flex-col">
-              <label htmlFor="file">
-                <div className="hover:text-primary flex items-center justify-center flex-col cursor-pointer transition">
-                  <AiOutlineCloudUpload className="text-5xl" />
-                  <span className="mt-2 font-nato">
-                    Upload image for campaign
-                  </span>
-                </div>
-                <input
-                  type="file"
-                  accept="image/png,image/jpeg,image/jpg"
-                  onChange={handleImage}
-                  className="hidden"
-                  id="file"
-                />
-              </label>
-            </div>
-          )}
-        </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <Input
+              title="Creator name"
+              value={values.name}
+              type="text"
+              onChange={handleChange}
+              name="name"
+              error={errors.name}
+            />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <Input
-            title="Creator name"
-            value={values.name}
-            type="text"
-            onChange={handleChange}
-            name="name"
-            error={errors.name}
-          />
+            <Input
+              title="Amount to be raised(ETH)"
+              value={values.amount}
+              type="number"
+              onChange={handleChange}
+              name="amount"
+              error={errors.amount}
+            />
+          </div>
 
-          <Input
-            title="Amount to be raised(ETH)"
-            value={values.amount}
-            type="number"
-            onChange={handleChange}
-            name="amount"
-            error={errors.amount}
-          />
-        </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <Input
+              title="End date"
+              value={endDate}
+              type="date"
+              onChange={handleSetEndDate}
+              name="endDaate"
+            />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <Input
-            title="End date"
-            value={endDate}
-            type="date"
-            onChange={handleSetEndDate}
-            name="endDaate"
-          />
+            <Input
+              title="Website URL(Optional)"
+              value={values.websiteURL}
+              type="text"
+              onChange={handleChange}
+              name="websiteURL"
+              error={errors.websiteURL}
+            />
+          </div>
 
-          <Input
-            title="Website URL(Optional)"
-            value={values.websiteURL}
-            type="text"
-            onChange={handleChange}
-            name="websiteURL"
-            error={errors.websiteURL}
-          />
-        </div>
+          <div className="">
+            <Button
+              type="submit"
+              title="Start a campaign"
+              className="px-2 py-3 w-full md:w-fit"
+            />
+          </div>
+        </form>
+      </section>
 
-        <div className="">
-          <Button
-            type="submit"
-            title="Start a campaign"
-            className="px-2 py-3 w-full md:w-fit"
-          />
-        </div>
-      </form>
-    </section>
+      {loading && <Loader message={loading} />}
+    </>
   );
 }

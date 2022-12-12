@@ -6,6 +6,14 @@ import "./Campaign.sol";
 contract CrowdFunding {
     address[] campagins;
 
+    event campaignCreated(
+        uint256 target,
+        uint256 startAt,
+        uint256 endAt,
+        string dataURI,
+        address campaign
+    );
+
     function createCampaign(
         uint256 target,
         uint256 startAt,
@@ -19,6 +27,8 @@ contract CrowdFunding {
         );
 
         campagins.push(newCampgain);
+
+        emit campaignCreated(target, startAt, endAt, dataURI, newCampgain);
     }
 
     function getCampaigns() public view returns (address[] memory) {

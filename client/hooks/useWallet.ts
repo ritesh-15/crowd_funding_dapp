@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { useEffect } from "react";
+import { toast } from "react-toastify";
 import userUser from "../app/slices/userSlice/userUser";
-import Superbase from "../utils/superbase";
 
 let eth: any = null;
 
@@ -12,11 +12,13 @@ if (typeof window !== "undefined") {
 
 export default function useWallet() {
   const { handleWalletAddress } = userUser();
-  const superbase = Superbase.get();
 
   useEffect(() => {
     (async () => {
-      if (eth == null) return;
+      if (eth == null)
+        return toast.error(
+          "Wallet not found please try again by reloading the window!"
+        );
       const provider = new ethers.providers.Web3Provider(eth);
       const [address] = await provider.send("eth_accounts", []);
       handleWalletAddress(address);
@@ -24,7 +26,10 @@ export default function useWallet() {
   }, []);
 
   const connectWallet = async () => {
-    if (eth == null) return;
+    if (eth == null)
+      return toast.error(
+        "Wallet not found please try again by reloading the window!"
+      );
     const provider = new ethers.providers.Web3Provider(eth);
     const [address] = await provider.send("eth_requestAccounts", []);
     handleWalletAddress(address);
