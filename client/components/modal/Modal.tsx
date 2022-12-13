@@ -23,7 +23,7 @@ export default function Modal({ children }: IProps) {
   return (
     <div
       ref={ref}
-      className={`w-full min-h-screen fixed top-0 left-0 flex items-center justify-center bg-[rgba(0,0,0,0.7)] transition ${
+      className={`w-full min-h-screen fixed top-0 z-25 left-0 flex items-center justify-center bg-[rgba(0,0,0,0.7)] transition ${
         open ? "opacity-1 pointer-events-auto" : "opacity-0 pointer-events-none"
       }`}
     >

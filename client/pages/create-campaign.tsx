@@ -10,6 +10,7 @@ import { useRouter } from "next/router";
 import UploadIpfs from "../services/UploadIpfs.service";
 import { toast } from "react-toastify";
 import { getCrowdFundingContractSigned } from "../utils/getCrowdFundingContract";
+import DatabaseService from "../services/Db.service";
 
 let eth: any = null;
 
@@ -38,26 +39,33 @@ const useCreateCampaign = () => {
   const [image, setImage] = useState<File | null>(null);
   const [endDate, setEndDate] = useState<string>("");
   const [loading, setLoading] = useState<string | undefined>();
+  const [created, setCreatead] = useState<boolean>(false);
 
   useEffect(() => {
     if (!eth) return;
+    if (!created) return;
+
     const contract = getCrowdFundingContractSigned(eth);
     contract.on(
       "campaignCreated",
-      (
-        target: string,
-        startAt: number,
-        endAt: number,
-        dataURI: string,
-        address: string
-      ) => {
-        console.log({ target, startAt, endAt, dataURI, address });
+      async (target, startAt, endAt, dataURI, address) => {
+        const db = new DatabaseService();
+        const responce = await db.createCampaign({
+          target: target.toString(),
+          startAt: startAt.toString(),
+          endAt: endAt.toString(),
+          dataURI,
+          address,
+        });
+        console.log(responce);
+        toast.success("Campaign created successfully!");
       }
     );
     return () => {
       contract.off("campaignCreated", () => {});
+      setCreatead(false);
     };
-  }, [eth]);
+  }, [eth, created]);
 
   const { handleChange, values, errors, handleSubmit } =
     useFormik<ICreateCampaignState>({
@@ -67,6 +75,7 @@ const useCreateCampaign = () => {
     });
 
   const createCamapaign = async (values: ICreateCampaignState) => {
+    setCreatead(false);
     // validate image
     if (!image) {
       toast.error("Please choose image!");
@@ -80,7 +89,9 @@ const useCreateCampaign = () => {
       return;
     }
 
-    setLoading("Uploading the meta data to IPFS please wait...");
+    setLoading(
+      "Uploading the meta data to IPFS please wait this might take time depending upon your network speed..."
+    );
 
     // upload file to ipfs
     const uploadService = new UploadIpfs();
@@ -106,6 +117,7 @@ const useCreateCampaign = () => {
       dataPath
     );
     setLoading(undefined);
+    setCreatead(true);
   };
 
   const handleImage = (e: ChangeEvent<HTMLInputElement>) => {
