@@ -11,7 +11,7 @@ import Modal from "../modal/Modal";
 const style = {
   listStyle: "mx-4 font-nato cursor-pointer",
   h1: "font-bold font-nato text-xl",
-  nav: "dark:bg-darkBg bg-white z-10 shadow-md flex items-center justify-between py-3 fixed top-0 left-0 right-0",
+  nav: "dark:bg-darkBg bg-white z-30 shadow-md flex items-center justify-between py-3 fixed top-0 left-0 right-0",
   linkStyle: "hover:text-primary transition",
   iconStyle: "text-xl",
 };
@@ -24,7 +24,7 @@ export default function Navbar() {
   return (
     <>
       <nav className={style.nav}>
-        <div className="w-[95%] mx-auto max-w-[1300px] dark:bg-darkBg bg-white flex items-center justify-between">
+        <div className="w-[95%]  mx-auto max-w-[1300px] dark:bg-darkBg bg-white flex items-center justify-between">
           <h1 className={style.h1}>
             <Link href="/">cfunder</Link>
           </h1>

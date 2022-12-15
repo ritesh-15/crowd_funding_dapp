@@ -39,33 +39,6 @@ const useCreateCampaign = () => {
   const [image, setImage] = useState<File | null>(null);
   const [endDate, setEndDate] = useState<string>("");
   const [loading, setLoading] = useState<string | undefined>();
-  const [created, setCreatead] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (!eth) return;
-    if (!created) return;
-
-    const contract = getCrowdFundingContractSigned(eth);
-    contract.on(
-      "campaignCreated",
-      async (target, startAt, endAt, dataURI, address) => {
-        const db = new DatabaseService();
-        const responce = await db.createCampaign({
-          target: target.toString(),
-          startAt: startAt.toString(),
-          endAt: endAt.toString(),
-          dataURI,
-          address,
-        });
-        console.log(responce);
-        toast.success("Campaign created successfully!");
-      }
-    );
-    return () => {
-      contract.off("campaignCreated", () => {});
-      setCreatead(false);
-    };
-  }, [eth, created]);
 
   const { handleChange, values, errors, handleSubmit } =
     useFormik<ICreateCampaignState>({
@@ -74,8 +47,29 @@ const useCreateCampaign = () => {
       validationSchema: createCampaignSchema,
     });
 
+  const listenEvent = () => {
+    const contract = getCrowdFundingContractSigned(eth);
+    contract.on(
+      "campaignCreated",
+      async (target, startAt, endAt, dataURI, address) => {
+        const db = new DatabaseService();
+        const data = {
+          target: target.toString(),
+          startAt: startAt.toString(),
+          endAt: endAt.toString(),
+          dataURL: dataURI,
+          address,
+        };
+        const { error } = await db.superbase
+          .from("campaigns")
+          .upsert({ ...data }, { onConflict: "address" });
+        console.log(error);
+        toast.success("Campaign created successfully!");
+      }
+    );
+  };
+
   const createCamapaign = async (values: ICreateCampaignState) => {
-    setCreatead(false);
     // validate image
     if (!image) {
       toast.error("Please choose image!");
@@ -110,14 +104,15 @@ const useCreateCampaign = () => {
       );
 
     const contract = getCrowdFundingContractSigned(eth);
-    await contract.createCampaign(
+    const tx = await contract.createCampaign(
       Number(values.amount),
       Date.now(),
       new Date(endDate).getTime(),
       dataPath
     );
+    await tx.wait();
     setLoading(undefined);
-    setCreatead(true);
+    listenEvent();
   };
 
   const handleImage = (e: ChangeEvent<HTMLInputElement>) => {

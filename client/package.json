@@ -19,6 +19,7 @@
     "ethers": "^5.7.2",
     "formik": "^2.2.9",
     "ipfs-http-client": "^59.0.0",
+    "moment": "^2.29.4",
     "next": "13.0.6",
     "next-themes": "^0.2.1",
     "react": "18.2.0",

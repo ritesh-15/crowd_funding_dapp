@@ -4,7 +4,7 @@ interface ICreateCampaign {
   target: string;
   startAt: number;
   endAt: number;
-  dataURI: string;
+  dataURL: string;
   address: string;
 }
 
