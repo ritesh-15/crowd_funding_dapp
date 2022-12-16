@@ -36,12 +36,12 @@ export default function Navbar() {
                 </Link>
               </li>
               <li className={style.listStyle}>
-                <Link className={style.linkStyle} href="/">
+                <Link className={style.linkStyle} href="/campaigns">
                   Explore
                 </Link>
               </li>
               <li className={style.listStyle}>
-                <Link className={style.linkStyle} href="/">
+                <Link className={style.linkStyle} href="/create-campaign">
                   Start Campaign
                 </Link>
               </li>
@@ -50,7 +50,7 @@ export default function Navbar() {
               {isLoggedIn && walletAddress ? (
                 <div className="">
                   <Image
-                    src={`https://avatars.dicebear.com/api/bottts/${walletAddress}.svg`}
+                    src={`${process.env.NEXT_PUBLIC_AVATAR_API}/${walletAddress}.svg`}
                     alt=""
                     width={35}
                     height={35}

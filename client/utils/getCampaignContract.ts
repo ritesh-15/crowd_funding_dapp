@@ -8,3 +8,10 @@ export const getCampaignContract = (address: string) => {
   const contract = new ethers.Contract(address, CAMPAIGN_ABI, provider);
   return contract;
 };
+
+export const getCampaignContractSigned = (address: string, eth: any) => {
+  const provider = new ethers.providers.Web3Provider(eth);
+  const signers = provider.getSigner();
+  const contract = new ethers.Contract(address, CAMPAIGN_ABI, signers);
+  return contract;
+};

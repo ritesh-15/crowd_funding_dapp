@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Button, Campaign, Loader } from "../components";
+import { Button, Campaign, CampaignSkeleton } from "../components";
 import DatabaseService from "../services/Db.service";
-import { getCrowdFundingContractSigned } from "../utils/getCrowdFundingContract";
 
 let eth: any = null;
 
@@ -25,6 +24,7 @@ export interface ICampaign {
     imageURL: string;
     websiteURL: string;
   };
+  raisedAmount?: string;
 }
 
 const useCampaigns = () => {
@@ -80,36 +80,14 @@ export default function Campaigns() {
         </div>
       ) : (
         <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          <div className="w-full sm:max-w-[350px] ">
-            <div className="h-[250px] overflow dark:bg-gray-700 rounded-md bg-gray-200 animate-pulse"></div>
-            <div className="h-[1.5rem] dark:bg-gray-700 rounded-md bg-gray-200 animate-pulse w-[75%] mt-4"></div>
-            <div className="h-[1rem] dark:bg-gray-700 rounded-md bg-gray-200 animate-pulse w-[50%] mt-2"></div>
-          </div>
-          <div className="w-full sm:max-w-[350px] ">
-            <div className="h-[250px] overflow dark:bg-gray-700 rounded-md bg-gray-200 animate-pulse"></div>
-            <div className="h-[1.5rem] dark:bg-gray-700 rounded-md bg-gray-200 animate-pulse w-[75%] mt-4"></div>
-            <div className="h-[1rem] dark:bg-gray-700 rounded-md bg-gray-200 animate-pulse w-[50%] mt-2"></div>
-          </div>
-          <div className="w-full sm:max-w-[350px] ">
-            <div className="h-[250px] overflow dark:bg-gray-700 rounded-md bg-gray-200 animate-pulse"></div>
-            <div className="h-[1.5rem] dark:bg-gray-700 rounded-md bg-gray-200 animate-pulse w-[75%] mt-4"></div>
-            <div className="h-[1rem] dark:bg-gray-700 rounded-md bg-gray-200 animate-pulse w-[50%] mt-2"></div>
-          </div>
-          <div className="w-full sm:max-w-[350px] ">
-            <div className="h-[250px] overflow dark:bg-gray-700 rounded-md bg-gray-200 animate-pulse"></div>
-            <div className="h-[1.5rem] dark:bg-gray-700 rounded-md bg-gray-200 animate-pulse w-[75%] mt-4"></div>
-            <div className="h-[1rem] dark:bg-gray-700 rounded-md bg-gray-200 animate-pulse w-[50%] mt-2"></div>
-          </div>
-          <div className="w-full sm:max-w-[350px] ">
-            <div className="h-[250px] overflow dark:bg-gray-700 rounded-md bg-gray-200 animate-pulse"></div>
-            <div className="h-[1.5rem] dark:bg-gray-700 rounded-md bg-gray-200 animate-pulse w-[75%] mt-4"></div>
-            <div className="h-[1rem] dark:bg-gray-700 rounded-md bg-gray-200 animate-pulse w-[50%] mt-2"></div>
-          </div>
-          <div className="w-full sm:max-w-[350px] ">
-            <div className="h-[250px] overflow dark:bg-gray-700 rounded-md bg-gray-200 animate-pulse"></div>
-            <div className="h-[1.5rem] dark:bg-gray-700 rounded-md bg-gray-200 animate-pulse w-[75%] mt-4"></div>
-            <div className="h-[1rem] dark:bg-gray-700 rounded-md bg-gray-200 animate-pulse w-[50%] mt-2"></div>
-          </div>
+          <CampaignSkeleton />
+          <CampaignSkeleton />
+          <CampaignSkeleton />
+          <CampaignSkeleton />
+          <CampaignSkeleton />
+          <CampaignSkeleton />
+          <CampaignSkeleton />
+          <CampaignSkeleton />
         </div>
       )}
     </section>

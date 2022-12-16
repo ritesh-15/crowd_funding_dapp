@@ -4,6 +4,7 @@ import { ICampaign } from "../../pages/campaigns";
 import { getCampaignContract } from "../../utils/getCampaignContract";
 import { parseWalletAddress } from "../../utils/parseWalletAddress";
 import moment from "moment";
+import { ethers } from "ethers";
 interface IProps {
   campaign: ICampaign;
 }
@@ -32,7 +33,10 @@ const useCampaign = (address: string) => {
       noOfContributors,
       minContribution,
     ] = await contract.getInfo();
-    setInfo({ manager, raisedAmount: raisedAmount.toString() });
+    setInfo({
+      manager,
+      raisedAmount: ethers.utils.formatEther(raisedAmount.toString()),
+    });
   };
 
   return { info };
