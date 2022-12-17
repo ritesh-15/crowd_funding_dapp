@@ -14,6 +14,13 @@ interface ICamp {
   manager: string;
 }
 
+const getWidthPercentage = (raised: string, target: string) => {
+  const a = Number(raised);
+  const b = Number(target);
+  const width = Math.floor((a / b) * 100).toString();
+  return `w-[${width}%]`;
+};
+
 const useCampaign = (address: string) => {
   const [info, setInfo] = useState<ICamp>();
 
@@ -44,12 +51,6 @@ const useCampaign = (address: string) => {
 
 export default function Campaign({ campaign }: IProps): JSX.Element {
   const { info } = useCampaign(campaign.address);
-
-  const getPercentage = (raised: string, target: string) => {
-    const a = Number(raised);
-    const b = Number(target);
-    return (a / b) * 100;
-  };
 
   return (
     <div className="w-full sm:max-w-[350px] overflow-hidden rounded-md hover:shadow-lg transition cursor-pointer">
@@ -100,12 +101,15 @@ export default function Campaign({ campaign }: IProps): JSX.Element {
             </p>
           </div>
         </div>
-        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-md mt-4">
-          <div
-            className={`bg-primary w-[${
-              info ? getPercentage(info?.raisedAmount, campaign.target) : "0"
-            }%] h-[0.75rem] rounded-md`}
-          ></div>
+        <div className="w-full relative bg-gray-200 dark:bg-gray-700 rounded-md mt-4">
+          {info && (
+            <div
+              className={`bg-primary ${getWidthPercentage(
+                info?.raisedAmount,
+                campaign.target
+              )} h-[0.75rem] rounded-md absolute top-0 bottom-0`}
+            ></div>
+          )}
         </div>
       </div>
     </div>

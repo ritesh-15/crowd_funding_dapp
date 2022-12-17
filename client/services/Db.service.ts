@@ -13,6 +13,7 @@ export interface ITransaction {
   campaign_address: string;
   amount: number;
   type: string;
+  txhash: string;
 }
 
 class DatabaseService {

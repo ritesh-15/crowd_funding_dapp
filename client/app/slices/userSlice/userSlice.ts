@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { isLabeledStatement } from "typescript";
 
 interface IUserState {
   walletAddress?: string;

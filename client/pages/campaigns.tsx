@@ -25,6 +25,7 @@ export interface ICampaign {
     websiteURL: string;
   };
   raisedAmount?: string;
+  manager?: string;
 }
 
 const useCampaigns = () => {
