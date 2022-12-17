@@ -94,7 +94,7 @@ export default function Campaign({ campaign }: IProps): JSX.Element {
               width={25}
               height={25}
               alt=""
-              src="https://avatars.dicebear.com/api/bottts/dfd.svg"
+              src={`${process.env.NEXT_PUBLIC_AVATAR_API}/${info?.manager}.svg`}
             />
             <p className="font-nato ml-2">
               {info && parseWalletAddress(info?.manager)}
