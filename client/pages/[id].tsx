@@ -97,7 +97,6 @@ const useCamapaign = () => {
       // clear the amount
       setAmount("");
     } catch (error) {
-      // @ts-ignore
       toast.error(
         "Something went wrong please try to refresh page or try again after some time!"
       );
